@@ -1,0 +1,78 @@
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment: 
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - app-network
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1 
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app-network
+    ports:
+      - "9092:9092"
+
+  producer_service:
+    build:
+      context: ./producer_service
+    container_name: producer_service
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./producer_service:/app
+
+  consumer_service_one:
+    build:
+      context: ./consumer_service_one
+    container_name: consumer_service_one
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - app-network
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./consumer_service_one:/app
+
+  consumer_service_two:
+    build:
+      context: ./consumer_service_two
+    container_name: consumer_service_two
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - app-network
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./consumer_service_two:/app
+
