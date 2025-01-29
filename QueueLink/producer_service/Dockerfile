@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Default command
-CMD ["python", "kafka_scripts/producer.py"]
+CMD ["gunicorn", "producer_service.wsgi:application", "--bind", "0.0.0.0:8000"]

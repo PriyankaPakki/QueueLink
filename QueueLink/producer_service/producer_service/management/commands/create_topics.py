@@ -13,8 +13,8 @@ class Command(BaseCommand):
         # Define topics
 
         topics = [
-            NewTopic(name="Q1", num_partitions=1, replication_factor=1),
-            NewTopic(name="Q2", num_partitions=1, replication_factor=1),
+            NewTopic(name="Q1", num_partitions=2, replication_factor=1),
+            # NewTopic(name="Q2", num_partitions=1, replication_factor=1),
         ]
 
         # Create KafkaAdminClient
@@ -25,9 +25,7 @@ class Command(BaseCommand):
         # Create topics
         try:
             admin_client.create_topics(new_topics=topics, validate_only=False)
-            self.stdout.write(
-                self.style.SUCCESS("Topics Q1 and Q2 created successfully!")
-            )
+            self.stdout.write(self.style.SUCCESS("Topics Q1 created successfully!"))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Error creating topics: {e}"))
         finally:

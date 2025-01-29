@@ -45,6 +45,8 @@ services:
       - "8000:8000"
     volumes:
       - ./producer_service:/app
+    command: ["gunicorn", "producer_service.wsgi:application", "--bind", "0.0.0.0:8000"]
+    restart: always
 
   consumer_service_one:
     build:
